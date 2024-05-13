@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
@@ -18,5 +17,9 @@ const styles = StyleSheet.create({
     },
 });
 
+// Set headerShown to false to remove the header
+Screen1.navigationOptions = {
+    headerShown: false,
+};
 
 export default Screen1;
