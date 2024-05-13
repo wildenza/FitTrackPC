@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 const Screen1 = () => {
     return (
         <View style={styles.container}>
-            <Text>This is Screen 1</Text>
+            <Text>ECRAN</Text>
         </View>
     );
 };
@@ -14,6 +14,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: '#192841', // Dark blue background color
     },
 });
 

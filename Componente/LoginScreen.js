@@ -4,12 +4,14 @@ import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from '@firebase/auth';
 import { app } from "./firebaseConfig";
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 
 const LoginScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [user, setUser] = useState(null); // Track user authentication state
     const [isLogin, setIsLogin] = useState(true);
+    const navigation = useNavigation(); // Use the navigation object
 
     const auth = getAuth(app);
     useEffect(() => {
@@ -32,10 +34,12 @@ const LoginScreen = () => {
                     // Sign in
                     await signInWithEmailAndPassword(auth, email, password);
                     console.log('User signed in successfully!');
+                    navigation.navigate('Screen2'); // Navigate to Screen2 after sign-in
                 } else {
                     // Sign up
                     await createUserWithEmailAndPassword(auth, email, password);
                     console.log('User created successfully!');
+                    navigation.navigate('Screen2'); // Navigate to Screen2 after sign-up
                 }
             }
         } catch (error) {
@@ -45,7 +49,7 @@ const LoginScreen = () => {
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            {user ? (
+            {user? (
                 // Show user's email if user is authenticated
                 <View style={styles.authContainer}>
                     <Text style={styles.title}>Welcome</Text>
@@ -55,7 +59,7 @@ const LoginScreen = () => {
             ) : (
                 // Show sign-in or sign-up form if user is not authenticated
                 <View style={styles.authContainer}>
-                    <Text style={styles.title}>{isLogin ? 'Sign In' : 'Sign Up'}</Text>
+                    <Text style={styles.title}>{isLogin? 'Sign In' : 'Sign Up'}</Text>
 
                     <TextInput
                         style={styles.input}
@@ -72,12 +76,12 @@ const LoginScreen = () => {
                         secureTextEntry
                     />
                     <View style={styles.buttonContainer}>
-                        <Button title={isLogin ? 'Sign In' : 'Sign Up'} onPress={handleAuthentication} color="#3498db" />
+                        <Button title={isLogin? 'Sign In' : 'Sign Up'} onPress={handleAuthentication} color="#3498db" />
                     </View>
 
                     <View style={styles.bottomContainer}>
                         <Text style={styles.toggleText} onPress={() => setIsLogin(!isLogin)}>
-                            {isLogin ? 'Need an account? Sign Up' : 'Already have an account? Sign In'}
+                            {isLogin? 'Need an account? Sign Up' : 'Already have an account? Sign In'}
                         </Text>
                     </View>
                 </View>
@@ -92,12 +96,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 16,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: 'black',
     },
     authContainer: {
         width: '80%',
         maxWidth: 400,
-        backgroundColor: '#fff',
+        backgroundColor: '#192841', // Dark blue background color
         padding: 16,
         borderRadius: 8,
         elevation: 3,
@@ -106,6 +110,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         marginBottom: 16,
         textAlign: 'center',
+        color: '#fff', // White text color
     },
     input: {
         height: 40,
@@ -114,13 +119,15 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         padding: 8,
         borderRadius: 4,
+        color: '#fff', // White text color
     },
     buttonContainer: {
         marginBottom: 16,
     },
     toggleText: {
-        color: '#3498db',
+
         textAlign: 'center',
+        color: '#fff', // White text color
     },
     bottomContainer: {
         marginTop: 20,
@@ -129,7 +136,9 @@ const styles = StyleSheet.create({
         fontSize: 18,
         textAlign: 'center',
         marginBottom: 20,
+        color: 'white', // White text color
     },
 });
+
 
 export default LoginScreen;

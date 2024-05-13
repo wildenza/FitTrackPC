@@ -3,20 +3,21 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
-import { Ionicons } from '@expo/vector-icons'; // Assuming you're using Expo
+import { Ionicons } from '@expo/vector-icons';
 
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
 
-// Import your existing screens
 import Screen1 from './Componente/Screen1';
 import Screen2 from './Componente/Screen2';
 import Screen3 from './Componente/Screen3';
 import DummyPG from './Componente/DummyPG';
+import Anunturi from "./Componente/Anunturi";
+import Users from "./Componente/Users";
 import LoginScreen from "./Componente/LoginScreen";
+import Abonamente from "./Componente/Abonamente";
 
-// Tab Bar Icon component
 const TabBarIcon = ({ route, focused, color, size }) => {
     let iconName;
 
@@ -31,14 +32,12 @@ const TabBarIcon = ({ route, focused, color, size }) => {
     return <Ionicons name={iconName} size={size} color={color} />;
 };
 
-// Stack Navigator for Bottom Tab Navigator
 const StackNavigator = () => (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Home" component={BottomTabNavigator} />
     </Stack.Navigator>
 );
 
-// Bottom Tab Navigator
 const BottomTabNavigator = () => (
     <Tab.Navigator
         screenOptions={({ route }) => ({
@@ -60,11 +59,14 @@ const BottomTabNavigator = () => (
     </Tab.Navigator>
 );
 
-// Drawer Navigator
 const DrawerNavigator = () => (
     <Drawer.Navigator initialRouteName="Home">
-        <Drawer.Screen name="Home" component={StackNavigator} />
+        <Drawer.Screen name="Panel" component={StackNavigator} />
         <Drawer.Screen name="Dummy" component={DummyPG} />
+        <Drawer.Screen name="Anunturi" component={Anunturi} />
+        <Drawer.Screen name="Users" component={Users} />
+        <Drawer.Screen name="Abonamente" component={Abonamente} />
+
     </Drawer.Navigator>
 );
 

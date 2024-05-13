@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const DummyPG = () => {
+const Abonamente = () => {
     return (
         <View style={styles.container}>
             <Text>Test</Text>
@@ -18,4 +18,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default DummyPG;
+export default Abonamente;

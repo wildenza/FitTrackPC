@@ -17,7 +17,8 @@
 //
 // export default { app };
 
-
+import { getAuth, setPersistence, browserLocalPersistence, initializeAuth, getReactNativePersistence } from '@firebase/auth';
+import {getDatabase} from "@firebase/database";
 //abcd
 import { initializeApp } from "firebase/app";
 
@@ -28,7 +29,8 @@ const firebaseConfig = {
     storageBucket: "fittrack-679b9.appspot.com",
     messagingSenderId: "784243670131",
     appId: "1:784243670131:web:d74dfb42ba26c06faa3e06",
-    measurementId: "G-TE4VHNEXYB"
+    measurementId: "G-TE4VHNEXYB",
+    databaseURL:"https://fittrack-679b9-default-rtdb.europe-west1.firebasedatabase.app"
 };
 
 const app = initializeApp(firebaseConfig);
