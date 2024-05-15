@@ -1,9 +1,10 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DrawerActions } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
+
 
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
@@ -33,11 +34,14 @@ const TabBarIcon = ({ route, focused, color, size }) => {
 };
 
 const StackNavigator = () => (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Home" component={BottomTabNavigator} />
+    <Stack.Navigator>
+        <Stack.Screen
+            name="Home"
+            component={BottomTabNavigator}
+            options={{ headerShown: false }}
+        />
     </Stack.Navigator>
 );
-
 const BottomTabNavigator = () => (
     <Tab.Navigator
         screenOptions={({ route }) => ({
@@ -53,11 +57,25 @@ const BottomTabNavigator = () => (
             },
         }}
     >
-        <Tab.Screen name="Screen1" component={Screen1} />
-        <Tab.Screen name="Screen2" component={Screen2} />
-        <Tab.Screen name="Screen3" component={LoginScreen} />
+        <Tab.Screen
+            name="Screen1"
+            component={Screen1}
+            options={{ headerShown: false }} // Hide header for Screen1
+        />
+        <Tab.Screen
+            name="Screen2"
+            component={Screen2}
+            options={{ headerShown: false }} // Hide header for Screen2
+        />
+        <Tab.Screen
+            name="Screen3"
+            component={LoginScreen}
+            options={{ headerShown: false }} // Hide header for Screen3
+        />
     </Tab.Navigator>
 );
+
+
 
 const DrawerNavigator = () => (
     <Drawer.Navigator initialRouteName="Home">
@@ -66,14 +84,16 @@ const DrawerNavigator = () => (
         <Drawer.Screen name="Anunturi" component={Anunturi} />
         <Drawer.Screen name="Users" component={Users} />
         <Drawer.Screen name="Abonamente" component={Abonamente} />
-
     </Drawer.Navigator>
 );
 
 export default function App() {
+
     return (
-        <NavigationContainer>
-            <DrawerNavigator />
-        </NavigationContainer>
+
+            <NavigationContainer>
+                <DrawerNavigator />
+            </NavigationContainer>
+
     );
 }

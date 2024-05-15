@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, Button, ScrollView } from 'react-native';
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from '@firebase/auth';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
 import { app } from "./firebaseConfig";
 import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 
@@ -125,7 +125,6 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     toggleText: {
-
         textAlign: 'center',
         color: '#fff', // White text color
     },
@@ -139,6 +138,5 @@ const styles = StyleSheet.create({
         color: 'white', // White text color
     },
 });
-
 
 export default LoginScreen;

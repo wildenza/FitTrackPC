@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { getDatabase, ref, onValue, off } from 'firebase/database';
 import app from './firebaseConfig'; // Assuming your firebaseConfig is located in the parent directory
 
+
 const Anunturi = () => {
     const [anunturi, setAnunturi] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -41,29 +42,31 @@ const Anunturi = () => {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.scrollViewContent}>
-            <View style={styles.container}>
-                <Text style={styles.title}>Anunturi</Text>
-                {loading ? (
-                    <Text>Loading...</Text>
-                ) : (
-                    <View>
-                        {anunturi.map((anunt, index) => (
-                            <TouchableOpacity
-                                key={index}
-                                style={styles.anuntContainer}
-                                onPress={() => toggleAnuntDetails(index)}
-                            >
-                                <Text style={styles.anuntTitle}>Anunt {index + 1}</Text>
-                                {expandedAnunt === index && (
-                                    <Text style={styles.anuntDetalii}>{anunt.Detalii.More}</Text>
-                                )}
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                )}
-            </View>
-        </ScrollView>
+
+            <ScrollView contentContainerStyle={styles.scrollViewContent}>
+                <View style={styles.container}>
+                    <Text style={styles.title}>Anunturi</Text>
+                    {loading ? (
+                        <Text>Loading...</Text>
+                    ) : (
+                        <View>
+                            {anunturi.map((anunt, index) => (
+                                <TouchableOpacity
+                                    key={index}
+                                    style={styles.anuntContainer}
+                                    onPress={() => toggleAnuntDetails(index)}
+                                >
+                                    <Text style={styles.anuntTitle}>Anunt {index + 1}</Text>
+                                    {expandedAnunt === index && (
+                                        <Text style={styles.anuntDetalii}>{anunt.Detalii.More}</Text>
+                                    )}
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    )}
+                </View>
+            </ScrollView>
+
     );
 };
 
@@ -93,9 +96,7 @@ const styles = StyleSheet.create({
         borderRadius: 10, // Increase border radius for rounded corners
         minHeight: 100, // Adjust the height as needed
         overflow: 'hidden', // Hide overflow content if any
-       
     },
-
     anuntTitle: {
         fontWeight: 'bold',
         marginBottom: 10, // Increase margin to separate title from details

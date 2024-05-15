@@ -19,8 +19,7 @@ const styles = StyleSheet.create({
 });
 
 // Set headerShown to false to remove the header
-Screen1.navigationOptions = {
+Screen1.options = {
     headerShown: false,
 };
-
 export default Screen1;
