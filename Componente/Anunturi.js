@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions, ImageBackground } from 'react-native';
 import { getDatabase, ref, onValue, off } from 'firebase/database';
 import app from './firebaseConfig'; // Assuming your firebaseConfig is located in the parent directory
-
+const backgroundImage = require('../assets/gradient.jpeg');
 
 const Anunturi = () => {
     const [anunturi, setAnunturi] = useState([]);
@@ -16,7 +16,7 @@ const Anunturi = () => {
         onValue(anunturiRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                const anunturiList = Object.entries(data).map(([key, value]) => ({ id: key, ...value }));
+                const anunturiList = Object.entries(data).map(([key, value]) => ({id: key, ...value}));
                 setAnunturi(anunturiList);
                 setLoading(false);
             } else {
@@ -42,34 +42,27 @@ const Anunturi = () => {
     };
 
     return (
-
-            <ScrollView contentContainerStyle={styles.scrollViewContent}>
-                <View style={styles.container}>
-                    <Text style={styles.title}>Anunturi</Text>
-                    {loading ? (
-                        <Text>Loading...</Text>
-                    ) : (
-                        <View>
-                            {anunturi.map((anunt, index) => (
-                                <TouchableOpacity
-                                    key={index}
-                                    style={styles.anuntContainer}
-                                    onPress={() => toggleAnuntDetails(index)}
-                                >
-                                    <Text style={styles.anuntTitle}>Anunt {index + 1}</Text>
-                                    {expandedAnunt === index && (
-                                        <Text style={styles.anuntDetalii}>{anunt.Detalii.More}</Text>
-                                    )}
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-                    )}
-                </View>
-            </ScrollView>
-
+        <ImageBackground source={backgroundImage} style={styles.backgroundImage}>
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
+            <View style={styles.container}>
+                <Text style={styles.title}></Text>
+                {loading ? (
+                    <Text>Loading...</Text>
+                ) : (
+                    <View>
+                        {anunturi.map((anunt, index) => (
+                            <View key={index} style={styles.anuntContainer}>
+                                <Text style={styles.anuntTitle}>Anunt {index + 1}</Text>
+                                <Text style={styles.anuntDetalii}>{anunt.Detalii.More}</Text>
+                            </View>
+                        ))}
+                    </View>
+                )}
+            </View>
+        </ScrollView>
+        </ImageBackground>
     );
 };
-
 const styles = StyleSheet.create({
     scrollViewContent: {
         flexGrow: 1,
@@ -80,7 +73,7 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center',
         paddingHorizontal: 20,
-        backgroundColor: '#192841', // Dark blue background color
+        marginTop: 50,
     },
     title: {
         fontSize: 20,
@@ -89,6 +82,7 @@ const styles = StyleSheet.create({
         color: '#fff', // White text color
     },
     anuntContainer: {
+        width: '100%',
         marginBottom: 20, // Increase margin to make boxes bigger
         padding: 20, // Increase padding to make boxes bigger
         borderWidth: 1,
@@ -105,6 +99,13 @@ const styles = StyleSheet.create({
     anuntDetalii: {
         color: 'white',
     },
+    backgroundImage: {
+        flex: 1,
+        resizeMode: 'cover',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });
+
 
 export default Anunturi;

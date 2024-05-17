@@ -1,57 +1,110 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, Button, ScrollView } from 'react-native';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
-import { getDatabase, ref, set, get, child, push } from 'firebase/database';
-import { app, auth, database } from './firebaseConfig';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, Button, ScrollView, Alert, Platform } from 'react-native';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { ref, set } from 'firebase/database';
+import { auth, database } from './firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const LoginScreen = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [dob, setDob] = useState(new Date());
+    const [phone, setPhone] = useState('');
+    const [location, setLocation] = useState('');
+    const [address, setAddress] = useState('');
     const [user, setUser] = useState(null);
     const [isLogin, setIsLogin] = useState(true);
+    const [showDatePicker, setShowDatePicker] = useState(false);
     const navigation = useNavigation();
 
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
-            if (user) {
-                fetchUserData(user.uid);
-            }
-        });
-
-        return () => unsubscribe();
-    }, []);
-
     const handleAuthentication = async () => {
+        // Check if any mandatory field is empty (for sign-up only)
+        if (!isLogin && (!email || !password || !firstName || !lastName || !dob || !phone)) {
+            Alert.alert('Error', 'All mandatory fields are required for sign-up.');
+            return;
+        }
+
+        // Email format validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            Alert.alert('Error', 'Invalid email format.');
+            return;
+        }
+
+        // Password strength validation (minimum 6 characters)
+        if (password.length < 6) {
+            Alert.alert('Error', 'Password must be at least 6 characters long.');
+            return;
+        }
+
+        // Romanian phone number format validation (for sign-up only)
+        if (!isLogin) {
+            const phoneRegex = /^(?:0|\+?40)(?:[ .-]?[0-9]){9}$/;
+            if (!phoneRegex.test(phone)) {
+                Alert.alert('Error', 'Invalid Romanian phone number format.');
+                return;
+            }
+        }
+
         try {
             if (user) {
                 console.log('User logged out successfully!');
                 await signOut(auth);
+                setUser(null);
             } else {
                 if (isLogin) {
                     await signInWithEmailAndPassword(auth, email, password);
                     console.log('User signed in successfully!');
+                    // Navigate to Screen2 with user email as parameter
                     navigation.navigate('Screen2');
                 } else {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     console.log('User created successfully!');
-                    await saveUserData(userCredential.user.uid, email);
+                    await saveUserData(userCredential.user.uid, email, firstName, lastName);
+                    // Navigate to Screen2 with user email as parameter
                     navigation.navigate('Screen2');
                 }
             }
         } catch (error) {
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential' ) {
+                // Display error for incorrect email or password
+                Alert.alert('Error', 'Incorrect email or password.');
+            } else if (error.code === 'auth/email-already-in-use') {
+                // Display error for existing email during signup
+                Alert.alert('Error', 'An account with this email already exists.');
+            } else {
+                // Display generic authentication error
+                Alert.alert('Error', 'Authentication failed. Please try again later.');
+            }
             console.error('Authentication error:', error.message);
         }
     };
 
-    const saveUserData = async (uid, email) => {
+    const handleDateChange = (event, selectedDate) => {
+        const currentDate = selectedDate || dob;
+        setShowDatePicker(Platform.OS === 'ios');
+        setDob(currentDate);
+    };
+    const showDatepicker = () => {
+        setShowDatePicker(true);
+    };
+
+    const saveUserData = async (uid, email, firstName, lastName) => {
         try {
             const userRef = ref(database, 'users/' + uid);
-            const emailRef = ref(database, 'usersByEmail/' + encodeEmail(email)); // Encode email to handle special characters
+            const emailRef = ref(database, 'usersByEmail/' + encodeEmail(email));
 
             const userData = {
                 email: email,
+                firstName: firstName,
+                lastName: lastName,
+                dob: dob.toISOString(), // Save date of birth as string
+                phone: phone,
+                location: location || null,
+                address: address || null,
                 isHeInTheGym: false,
                 Checks: {"null":"null"},
                 Privacy: false,
@@ -59,7 +112,6 @@ const LoginScreen = () => {
                 Locker: "null"
             };
 
-            // Perform both writes in a single transaction
             await set(userRef, userData);
             await set(emailRef, uid);
 
@@ -68,6 +120,7 @@ const LoginScreen = () => {
             console.error('Error saving user data:', error.message);
         }
     };
+
 
     // Helper function to encode email for use as a Firebase key
     const encodeEmail = (email) => {
@@ -111,6 +164,16 @@ const LoginScreen = () => {
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
+            {showDatePicker && (
+                <DateTimePicker
+                    testID="dateTimePicker"
+                    value={dob}
+                    mode="date"
+                    is24Hour={true}
+                    display="default"
+                    onChange={handleDateChange}
+                />
+            )}
             {user ? (
                 <View style={styles.authContainer}>
                     <Text style={styles.title}>Welcome</Text>
@@ -120,6 +183,47 @@ const LoginScreen = () => {
             ) : (
                 <View style={styles.authContainer}>
                     <Text style={styles.title}>{isLogin ? 'Sign In' : 'Sign Up'}</Text>
+                    {!isLogin && (
+                        <>
+                            <Button title="Pick Date of Birth" onPress={showDatepicker} />
+                            <TextInput
+                                style={styles.input}
+                                value={firstName}
+                                onChangeText={setFirstName}
+                                placeholder="First Name"
+                                autoCapitalize="words"
+                            />
+                            <TextInput
+                                style={styles.input}
+                                value={lastName}
+                                onChangeText={setLastName}
+                                placeholder="Last Name"
+                                autoCapitalize="words"
+                            />
+                            <TextInput
+                                style={styles.input}
+                                value={phone}
+                                onChangeText={setPhone}
+                                placeholder="Romanian Phone Number"
+                                keyboardType="phone-pad"
+                                autoCapitalize="none"
+                            />
+                            <TextInput
+                                style={styles.input}
+                                value={location}
+                                onChangeText={setLocation}
+                                placeholder="Location (Optional)"
+                                autoCapitalize="words"
+                            />
+                            <TextInput
+                                style={styles.input}
+                                value={address}
+                                onChangeText={setAddress}
+                                placeholder="Address (Optional)"
+                                autoCapitalize="words"
+                            />
+                        </>
+                    )}
                     <TextInput
                         style={styles.input}
                         value={email}

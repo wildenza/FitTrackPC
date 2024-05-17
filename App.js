@@ -1,102 +1,70 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
-import { Ionicons } from '@expo/vector-icons';
 
-// Create the navigators
-const Tab = createBottomTabNavigator();
-const Drawer = createDrawerNavigator();
-const Stack = createStackNavigator();
+// Import Firebase
+import { app, database, auth } from './Componente/firebaseConfig';
 
 // Import your screens
-import Screen1 from './Componente/Screen1';
 import Screen2 from './Componente/Screen2';
-import Profile from './Componente/Profile';
-import Screen3 from './Componente/Screen3';
-import DummyPG from './Componente/DummyPG';
+import LoginScreen from "./Componente/LoginScreen";
 import Anunturi from "./Componente/Anunturi";
 import Users from "./Componente/Users";
-import LoginScreen from "./Componente/LoginScreen";
 import Abonamente from "./Componente/Abonamente";
+import Profile from "./Componente/Profile";
+import Checkins from "./Componente/Checkins";
+import Hours from './Componente/Hours';
 
-// Custom icon component
-const TabBarIcon = ({ route, focused, color, size }) => {
-    let iconName;
-
-    if (route.name === 'Screen1') {
-        iconName = focused? 'home' : 'home-outline';
-    } else if (route.name === 'Screen2') {
-        iconName = focused? 'logo-react' : 'logo-react';
-    } else if (route.name === 'Screen3') {
-        iconName = focused? 'settings' : 'settings-outline';
-    }
-
-    return <Ionicons name={iconName} size={size} color={color} />;
-};
-
-// Define the BottomTabNavigator
-const BottomTabNavigator = () => (
-    <Tab.Navigator
-        screenOptions={({ route }) => ({
-            tabBarIcon: ({ focused, color, size }) => (
-                <TabBarIcon route={route} focused={focused} color={color} size={size} />
-            ),
-        })}
-        tabBarOptions={{
-            activeTintColor: 'tomato',
-            inactiveTintColor: 'gray',
-            style: {
-                borderTopWidth: 0,
-            },
-        }}
-    >
-        {/*<Tab.Screen
-            name="Screen1"
-            component={Screen1}
-            options={{ headerShown: false }} // Hide header for Screen1
-        />*/}
-        <Tab.Screen
-            name="Screen2"
-            component={Screen2}
-            options={{ headerShown: false }} // Hide header for Screen2
-        />
-        <Tab.Screen
-            name="Screen3"
-            component={LoginScreen}
-            options={{ headerShown: false }} // Hide header for Screen3
-        />
-    </Tab.Navigator>
-);
+// Create the navigators
+const Drawer = createDrawerNavigator();
+const Stack = createStackNavigator();
 
 // Define the StackNavigator
 const StackNavigator = () => (
     <Stack.Navigator>
         <Stack.Screen
-            name="Home"
-            component={BottomTabNavigator}
-            options={{ headerShown: false }}
+            name="Screen2"
+            component={Screen2}
+            options={{ headerShown: false }} // Hide header for Screen2
         />
     </Stack.Navigator>
 );
 
-// Define the DrawerNavigator
 const DrawerNavigator = () => (
-    <Drawer.Navigator initialRouteName="Home">
+    <Drawer.Navigator
+        initialRouteName="Screen2"
+        screenOptions={{ headerTransparent: true, headerTitleStyle: { color: 'transparent' } }} // Hide header for all drawer screens
+    >
         <Drawer.Screen name="Panel" component={StackNavigator} />
-        {/*<Drawer.Screen name="Dummy" component={DummyPG} />*/}
         <Drawer.Screen name="Anunturi" component={Anunturi} />
         <Drawer.Screen name="Users" component={Users} />
         <Drawer.Screen name="Abonamente" component={Abonamente} />
+        <Drawer.Screen name="Profile" component={Profile} />
+        <Drawer.Screen name="Checkins" component={Checkins} />
+        <Drawer.Screen name="Hours" component={Hours} />
+        {/*<Drawer.Screen name="Paypal" component={Paypal} />*/}
     </Drawer.Navigator>
 );
 
+
 // Main App component
 export default function App() {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        // Check if user is logged in
+        const unsubscribe = auth.onAuthStateChanged(user => {
+            setIsLoggedIn(!!user);
+        });
+
+        // Cleanup subscription on unmount
+        return () => unsubscribe();
+    }, []);
+
     return (
         <NavigationContainer>
-            <DrawerNavigator />
+            {isLoggedIn ? <DrawerNavigator /> : <LoginScreen />}
         </NavigationContainer>
     );
 }

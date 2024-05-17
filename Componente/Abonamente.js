@@ -29,7 +29,7 @@ const Abonamente = () => {
     }, []);
 
     return (
-        <ImageBackground source={require('../assets/download.jpeg')} style={styles.backgroundImage}>
+        <ImageBackground source={require('../assets/gradient.jpeg')} style={styles.backgroundImage}>
             <View style={styles.container}>
                 <Text style={styles.title}>Abonamente</Text>
                 {loading? (
@@ -71,10 +71,10 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         padding: 20,
         borderWidth: 1, // Ensure the border width is visible
-        borderColor: 'lightblue', // Lighta blue border color
+        borderColor: '#0d0063', // Lighta blue border color
         borderRadius: 10,
         minHeight: 100,
-        backgroundColor: '#11bbff', // Add a light blue background color
+        backgroundColor: '#0d0063', // Add a light blue background color
         overflow: 'hidden',
     },
     abonamentTitle: {

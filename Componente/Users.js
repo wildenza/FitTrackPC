@@ -1,89 +1,91 @@
+//Users.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView , ImageBackground} from 'react-native';
 import { getDatabase, ref, onValue, off } from 'firebase/database';
-import app from './firebaseConfig'; // Assuming your firebaseConfig is located in the parent directory
-
+import { app } from './firebaseConfig'; // Adjust the import according to your project structure
+const backgroundImage = require('../assets/gradient.jpeg');
 const Users = () => {
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [peopleInTheGym, setPeopleInTheGym] = useState(0);
+    const [visibleUsers, setVisibleUsers] = useState([]);
 
     useEffect(() => {
         const database = getDatabase(app);
-        const usersRef = ref(database, 'Users');
+        const peopleInTheGymRef = ref(database, 'PersonsInTheGym');
+        const usersRef = ref(database, 'users');
 
-        const unsubscribe = onValue(usersRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                const usersList = Object.entries(data).map(([key, value]) => ({ name: key, ...value }));
-                setUsers(usersList);
-                setLoading(false);
-            } else {
-                setUsers([]);
-                setLoading(false);
-            }
-        });
+        const handlePeopleInTheGymChange = snapshot => {
+            const peopleCount = snapshot.val();
+            setPeopleInTheGym(peopleCount);
+        };
+
+        const handleUsersChange = snapshot => {
+            const usersData = snapshot.val();
+            const usersArray = Object.values(usersData).filter(user => user.isHeInTheGym && user.Privacy);
+            setVisibleUsers(usersArray);
+        };
+
+        onValue(peopleInTheGymRef, handlePeopleInTheGymChange);
+        onValue(usersRef, handleUsersChange);
 
         // Cleanup function
         return () => {
-            // Unsubscribe the listener when the component unmounts
-            unsubscribe();
+            off(peopleInTheGymRef, 'value', handlePeopleInTheGymChange);
+            off(usersRef, 'value', handleUsersChange);
         };
     }, []);
 
     return (
-        <ScrollView contentContainerStyle={styles.scrollViewContent}>
-            <View style={styles.container}>
-                <Text style={styles.title}>Users Screen</Text>
-                {loading ? (
-                    <Text>Loading...</Text>
-                ) : (
-                    <View>
-                        {users.map((user, index) => (
-                            <View key={index} style={styles.userContainer}>
-                                <Text style={styles.userName}>{user.name}</Text>
-                                <Text style={styles.usrPackage}>Package: {user.Package}</Text>
-                            </View>
-                        ))}
-                    </View>
-                )}
-            </View>
+        <ImageBackground source={backgroundImage} style={styles.backgroundImage}>
+        <ScrollView contentContainerStyle={styles.container}>
+            <Text style={styles.text}>People in the Gym: {peopleInTheGym}</Text>
+            {visibleUsers.length > 0 && (
+                <View style={styles.visibleUsersContainer}>
+                    <Text style={styles.subHeader}>Visible Persons:</Text>
+                    {visibleUsers.map((user, index) => (
+                        <Text key={index} style={styles.userName}>{user.firstName}</Text>
+                    ))}
+                </View>
+            )}
         </ScrollView>
+        </ImageBackground>
     );
 };
 
 const styles = StyleSheet.create({
-    scrollViewContent: {
-        flexGrow: 1,
-        alignItems: 'center',
-    },
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        width: '100%', // Set width to 100% to fill the entire screen width
-        paddingHorizontal: 20,
-        backgroundColor: '#192841', // Dark blue background color
-    },
-    title: {
-        fontSize: 20,
+    text: {
+        fontSize: 24,
         fontWeight: 'bold',
         marginBottom: 20,
-        color: '#fff', // White text color
+        color: 'white',
     },
-    userContainer: {
-        marginBottom: 20, // Increase margin to make boxes bigger
-        padding: 20, // Increase padding to make boxes bigger
-        borderWidth: 1,
-        borderColor: 'lightgray',
-        borderRadius: 10, // Increase border radius for rounded corners
+    container: {
+        flexGrow: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
     },
-    usrPackage:{
-        color:'white',
-
+    header: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    visibleUsersContainer: {
+        marginTop: 20,
+    },
+    subHeader: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
     },
     userName: {
-        fontWeight: 'bold',
-        marginBottom: 10, // Increase margin to separate title from details
-        color: '#fff', // White text color
+        fontSize: 16,
+        marginVertical: 5,
+    },
+    backgroundImage: {
+        flex: 1,
+        resizeMode: 'cover',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
 

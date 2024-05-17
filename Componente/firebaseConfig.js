@@ -1,9 +1,14 @@
+//firebaseConfig.js
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { initializeApp } from "firebase/app";
 import { getDatabase } from 'firebase/database';
-
+import { getFirestore } from 'firebase/firestore';
 // Firebase configuration
+
+import { onAuthStateChanged } from 'firebase/auth';
+
+
 const firebaseConfig = {
     apiKey: "AIzaSyAIxem0jHMHPX73SEMR2jrcuWiEsEUeSIk",
     authDomain: "fittrack-679b9.firebaseapp.com",
@@ -25,4 +30,4 @@ const auth = initializeAuth(app, {
 });
 
 // Export app, auth, and database instances
-export { app, auth, database };
+export { app, auth, database, onAuthStateChanged  };
